@@ -1,6 +1,6 @@
-# Hugging Face Agent Intrusion Emulation Kit for Elastic
+# Hugging Face Agent Intrusion Replay for Elastic
 
-A safe, synthetic Elastic Security emulation kit for the public Hugging Face agent intrusion timeline.
+A safe, synthetic replay of the public Hugging Face agent intrusion using Elastic Security detections.
 
 This repository contains:
 

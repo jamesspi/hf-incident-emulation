@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hugging Face Agent Intrusion Emulation Kit for Elastic</title>
+  <title>Hugging Face Agent Intrusion Replay for Elastic</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <meta
     name="description"
-    content="A synthetic intrusion replay for generating Elastic Security alerts from the public Hugging Face agent intrusion."
+    content="A synthetic replay of the public Hugging Face agent intrusion using Elastic Security detections."
   />
   <style>
     :root {
@@ -375,6 +375,7 @@
       width: 100%;
       height: auto;
       max-width: 100%;
+      aspect-ratio: 1040 / 540;
     }
     .zone { fill: rgba(255,255,255,0.018); stroke: rgba(255,255,255,0.12); stroke-dasharray: 5 6; }
     .zone-label { fill: var(--faint); font: 10px var(--mono); letter-spacing: 0.14em; text-transform: uppercase; }
@@ -923,12 +924,12 @@
     <section class="hero" aria-label="Hugging Face attack emulation hero">
       <div class="hero-inner">
         <div class="micro-pill">Synthetic Elastic replay for the Hugging Face incident</div>
-        <h1 class="wordmark">HF ATTACK EMU</h1>
+        <h1 class="wordmark">HF INCIDENT REPLAY</h1>
         <p class="tagline">▸ emulate the public incident safely.</p>
-        <h2 class="headline">A tool to emulate the Hugging Face agent intrusion in <strong>Elastic Security.</strong></h2>
+        <h2 class="headline">Safely replay the public Hugging Face agent intrusion with <strong>Elastic detections.</strong></h2>
         <p class="subhead">
-          Generate safe synthetic telemetry for the public Hugging Face agent intrusion, exercise OOTB
-          Elastic Security coverage, and produce a coherent attack narrative from the resulting alerts.
+          Generate synthetic telemetry shaped from the public Hugging Face incident, exercise OOTB
+          Elastic Security and Elastic Defend coverage, and produce a coherent attack narrative from the resulting alerts.
         </p>
         <p class="source-credit">
           Inspired by and credited to Hugging Face's public incident materials:
@@ -957,7 +958,7 @@
           <span class="chip">nodes ignite as the synthetic agent reaches them</span>
         </div>
         <div class="graph-wrap">
-          <svg class="graph" viewBox="0 0 1040 520" role="img" aria-label="Attack chain graph from launchpad to source control and exfiltration">
+          <svg class="graph" viewBox="0 0 1040 540" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Attack chain graph from launchpad to source control and exfiltration">
             <defs>
               <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="#ff4daf"></stop>
@@ -1001,7 +1002,7 @@
             <path class="edge" d="M564 176 C604 176, 616 142, 656 142"></path>
             <path class="edge alt" d="M564 176 C606 176, 616 246, 656 246"></path>
             <path class="edge alt" d="M764 246 C804 246, 816 176, 856 176"></path>
-            <path class="edge" d="M364 384 C520 520, 744 508, 856 336"></path>
+            <path class="edge" d="M364 392 C520 548, 756 534, 856 338"></path>
             <path class="edge alt" d="M310 222 L310 338"></path>
             <path class="edge alt" d="M510 222 L510 338"></path>
 

@@ -1038,7 +1038,7 @@ def run_attack_discovery(kibana: KibanaClient, run_id: str, run_tag: str, connec
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run the Hugging Face agent intrusion emulation against an Elastic cluster.")
+    parser = argparse.ArgumentParser(description="Run the Hugging Face agent intrusion replay using an Elastic cluster.")
     parser.add_argument("--es-url", default=os.getenv("ES_URL") or "http://localhost:9200", help="Elasticsearch URL. Default: %(default)s")
     parser.add_argument("--kibana-url", default=os.getenv("KIBANA_URL") or "http://localhost:5601", help="Kibana URL. Default: %(default)s")
     parser.add_argument("--space", default=os.getenv("KIBANA_SPACE") or "default", help="Kibana space. Default: %(default)s")
