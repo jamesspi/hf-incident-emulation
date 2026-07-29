@@ -1,0 +1,1432 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hugging Face Agent Intrusion Emulation Kit for Elastic</title>
+  <meta
+    name="description"
+    content="A Lurelit-inspired synthetic intrusion replay for generating Elastic Security alerts from the public Hugging Face agent intrusion."
+  />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070314;
+      --bg2: #0d0820;
+      --panel: rgba(15, 13, 32, 0.72);
+      --panel-strong: rgba(18, 16, 38, 0.90);
+      --line: rgba(255, 255, 255, 0.12);
+      --line-strong: rgba(255, 96, 186, 0.38);
+      --text: #fff7fb;
+      --muted: #b9adc7;
+      --faint: #746983;
+      --pink: #ff4daf;
+      --pink2: #ff7ac8;
+      --cyan: #23f5dc;
+      --violet: #b2a7ff;
+      --lime: #d7ff64;
+      --red: #ff6c8f;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: var(--sans);
+      background:
+        radial-gradient(circle at 50% -10%, rgba(255, 77, 175, 0.26), transparent 28%),
+        radial-gradient(circle at 72% 16%, rgba(35, 245, 220, 0.10), transparent 20%),
+        radial-gradient(circle at 24% 20%, rgba(255, 77, 175, 0.10), transparent 22%),
+        linear-gradient(180deg, #070314 0%, #0b061a 46%, #06030e 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: radial-gradient(circle at 50% 20%, black 0%, transparent 68%);
+      opacity: 0.42;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 18% 42%, rgba(255, 77, 175, 0.25) 0 2px, transparent 3px),
+        radial-gradient(circle at 76% 56%, rgba(35, 245, 220, 0.22) 0 2px, transparent 3px),
+        radial-gradient(circle at 54% 12%, rgba(255, 255, 255, 0.22) 0 1px, transparent 2px),
+        radial-gradient(circle at 42% 78%, rgba(255, 77, 175, 0.20) 0 1px, transparent 2px);
+      opacity: 0.72;
+    }
+
+    a { color: inherit; }
+    code, pre { font-family: var(--mono); }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .repo-link {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 10;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 999px;
+      background: rgba(8, 7, 20, 0.76);
+      color: var(--text);
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      backdrop-filter: blur(14px);
+    }
+
+    .repo-link svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .repo-link:hover {
+      border-color: rgba(35,245,220,0.58);
+      color: var(--cyan);
+    }
+
+    .hero {
+      min-height: auto;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 58px 0 44px;
+    }
+
+    .hero-inner {
+      width: 100%;
+      display: grid;
+      justify-items: center;
+    }
+
+    .micro-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+      padding: 0 14px;
+      border: 1px solid rgba(255, 77, 175, 0.45);
+      border-radius: 4px;
+      background: rgba(255, 77, 175, 0.10);
+      color: #ffc8e4;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      box-shadow: 0 0 28px rgba(255, 77, 175, 0.16);
+    }
+
+    .wordmark {
+      margin: 24px 0 8px;
+      font-size: clamp(64px, 12vw, 152px);
+      line-height: 0.78;
+      letter-spacing: -0.09em;
+      font-weight: 950;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #fff7fb 0%, #ff5ab5 38%, #b9b2ff 72%, #f6f0ff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow:
+        0 0 18px rgba(255, 77, 175, 0.24),
+        0 0 70px rgba(255, 77, 175, 0.22);
+    }
+
+    .tagline {
+      margin: 0 0 22px;
+      color: rgba(255, 216, 236, 0.70);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+    }
+
+    .headline {
+      max-width: 720px;
+      margin: 0;
+      font-size: clamp(25px, 3vw, 39px);
+      line-height: 1.05;
+      letter-spacing: -0.05em;
+      font-weight: 850;
+    }
+
+    .headline strong {
+      color: var(--pink2);
+      text-shadow: 0 0 30px rgba(255, 77, 175, 0.35);
+    }
+
+    .subhead {
+      max-width: 660px;
+      margin: 18px auto 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .source-credit {
+      max-width: 760px;
+      margin: 18px auto 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .source-credit a {
+      color: var(--cyan);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(35, 245, 220, 0.45);
+    }
+
+    .source-credit a:hover {
+      border-bottom-color: var(--cyan);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 3px;
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .btn.primary {
+      background: var(--pink);
+      color: #140613;
+      border-color: var(--pink);
+      font-weight: 900;
+      box-shadow: 0 0 36px rgba(255, 77, 175, 0.34);
+    }
+
+    .btn.secondary {
+      background: var(--cyan);
+      color: #031412;
+      border-color: var(--cyan);
+      font-weight: 900;
+      box-shadow: 0 0 32px rgba(35, 245, 220, 0.20);
+    }
+
+    .workflow-card {
+      width: min(520px, 100%);
+      margin-top: 34px;
+      text-align: left;
+      border: 1px solid rgba(255,255,255,0.13);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)),
+        rgba(8, 7, 20, 0.82);
+      box-shadow:
+        0 0 0 1px rgba(255, 77, 175, 0.10),
+        0 0 70px rgba(255, 77, 175, 0.10);
+    }
+
+    .workflow-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      color: var(--faint);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .workflow-head b { color: var(--pink2); font-weight: 700; }
+
+    .workflow-row {
+      display: grid;
+      grid-template-columns: 48px 84px 1fr;
+      gap: 12px;
+      padding: 9px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.055);
+      color: #e9dff0;
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .workflow-row:last-child { border-bottom: 0; }
+    .workflow-row time { color: var(--faint); }
+    .workflow-row b { color: var(--cyan); font-weight: 800; }
+    .workflow-row.warn b { color: var(--pink2); }
+    .workflow-row.hint b { color: var(--lime); }
+    .workflow-row.is-active {
+      background: rgba(255, 77, 175, 0.10);
+      box-shadow: inset 3px 0 0 var(--pink);
+    }
+
+    .section-kicker {
+      margin: 42px 0 14px;
+      text-align: center;
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      max-width: 820px;
+      margin: 0 auto 28px;
+      text-align: center;
+      font-size: clamp(34px, 5vw, 64px);
+      line-height: 0.96;
+      letter-spacing: -0.07em;
+    }
+
+    .replay-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.68fr) minmax(300px, 0.52fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 15px;
+      border-bottom: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: -0.03em;
+    }
+
+    .chip {
+      padding: 4px 8px;
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 999px;
+      color: var(--faint);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+    }
+
+    .graph-wrap {
+      min-height: 520px;
+      padding: 22px;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(255, 77, 175, 0.08), transparent 38%),
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.020) 1px, transparent 1px),
+        rgba(4, 6, 14, 0.64);
+      background-size: 42px 42px;
+    }
+
+    .graph { width: 100%; min-height: 500px; }
+    .zone { fill: rgba(255,255,255,0.018); stroke: rgba(255,255,255,0.12); stroke-dasharray: 5 6; }
+    .zone-label { fill: var(--faint); font: 10px var(--mono); letter-spacing: 0.14em; text-transform: uppercase; }
+    .stage-num { fill: #05030d; stroke: rgba(255, 77, 175, 0.70); }
+    .stage-text { fill: var(--pink2); font: 700 11px var(--mono); }
+    .node { fill: rgba(17, 13, 35, 0.95); stroke: rgba(255,255,255,0.18); }
+    .node.hot { fill: rgba(255, 77, 175, 0.11); stroke: rgba(255, 77, 175, 0.92); }
+    .node.cyan { fill: rgba(35, 245, 220, 0.08); stroke: rgba(35, 245, 220, 0.72); }
+    .node.violet { fill: rgba(178, 167, 255, 0.10); stroke: rgba(178, 167, 255, 0.70); }
+    .node.red { fill: rgba(255, 108, 143, 0.10); stroke: rgba(255, 108, 143, 0.70); }
+    .node.is-active {
+      stroke: var(--pink);
+      stroke-width: 3;
+      filter: drop-shadow(0 0 14px rgba(255, 77, 175, 0.72));
+    }
+    .edge { fill: none; stroke: url(#pathGradient); stroke-width: 2.4; marker-end: url(#arrow); filter: drop-shadow(0 0 8px rgba(215,255,100,0.42)); }
+    .edge.alt { stroke: url(#altGradient); filter: drop-shadow(0 0 8px rgba(35,245,220,0.28)); }
+    .small { fill: var(--muted); font: 12px var(--mono); }
+    .node-text { fill: var(--text); font-family: var(--sans); }
+
+    .side {
+      display: grid;
+      gap: 16px;
+    }
+
+    .phase-list,
+    .volume-list,
+    .rules-list {
+      display: grid;
+    }
+
+    .phase,
+    .volume-row,
+    .rule {
+      display: grid;
+      grid-template-columns: 142px 1fr 42px;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.065);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .rule {
+      grid-template-columns: 1fr auto;
+      font-family: var(--sans);
+      font-size: 13px;
+    }
+
+    .phase:last-child,
+    .volume-row:last-child,
+    .rule:last-child { border-bottom: 0; }
+    .phase b { text-transform: uppercase; letter-spacing: 0.04em; }
+    .phase span, .volume-row span, .rule span { color: var(--faint); text-align: right; }
+    .phase.is-active,
+    .stream-row.is-active {
+      background: rgba(35, 245, 220, 0.08);
+      box-shadow: inset 3px 0 0 var(--cyan);
+    }
+    .bar { height: 7px; border-radius: 999px; background: rgba(0,0,0,0.38); overflow: hidden; }
+    .bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--pink), var(--cyan)); }
+
+    .lower {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .lower.stream-only {
+      grid-template-columns: 1fr;
+    }
+
+    .stream-row {
+      display: grid;
+      grid-template-columns: 52px 1fr 110px;
+      gap: 12px;
+      padding: 11px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.065);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .stream-row time { color: var(--lime); }
+    .stream-row span { color: var(--faint); text-align: right; }
+
+    .rule a,
+    .coverage a {
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(35,245,220,0.45);
+    }
+
+    .rule a:hover,
+    .coverage a:hover { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+    .coverage {
+      margin-top: 16px;
+    }
+
+    .coverage-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 14px;
+    }
+
+    .coverage-grid.checklist-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .coverage-box {
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(4, 6, 14, 0.34);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .coverage-box.wide {
+      grid-column: span 2;
+    }
+
+    .coverage-box h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+
+    .coverage-box ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .coverage-box.wide ul { columns: 2; column-gap: 28px; }
+    .coverage-box li + li { margin-top: 6px; }
+
+    .rule-group-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .rule-group-grid.single {
+      grid-template-columns: 1fr;
+    }
+
+    .rule-group {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.025);
+      overflow: hidden;
+    }
+
+    .rule-group-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 11px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .rule-count {
+      min-width: 24px;
+      height: 20px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .rule-group ul {
+      margin: 0;
+      padding: 9px 11px 11px 22px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.48;
+    }
+
+    .coverage-box.wide .rule-group ul {
+      columns: 1;
+    }
+
+    .mitre {
+      margin-top: 16px;
+    }
+
+    .matrix-wrap {
+      overflow-x: auto;
+      padding: 14px;
+    }
+
+    .mitre-legend {
+      display: grid;
+      gap: 8px;
+      padding: 12px 14px 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .legend-label {
+      color: var(--text);
+      font-weight: 800;
+      min-width: 122px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-swatch {
+      width: 24px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .legend-swatch.high { background: linear-gradient(90deg, rgba(255,77,175,0.88), rgba(146,45,132,0.82)); }
+    .legend-swatch.med { background: linear-gradient(90deg, rgba(178,167,255,0.72), rgba(91,67,154,0.76)); }
+    .legend-swatch.low { background: linear-gradient(90deg, rgba(35,245,220,0.46), rgba(22,111,121,0.70)); }
+
+    .matrix {
+      min-width: 1060px;
+      display: grid;
+      grid-template-columns: 150px repeat(9, 1fr);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(4, 6, 14, 0.34);
+    }
+
+    .matrix > div {
+      min-height: 62px;
+      padding: 10px;
+      border-right: 1px solid rgba(255,255,255,0.07);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+    }
+
+    .matrix > div:nth-child(10n) {
+      border-right: 0;
+    }
+
+    .matrix .head,
+    .matrix .rowhead {
+      color: var(--text);
+      font-family: var(--mono);
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.035);
+    }
+
+    .matrix .cell b {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--text);
+      font-size: 11px;
+    }
+
+    .matrix .siem b { color: var(--cyan); }
+    .matrix .defend b { color: var(--pink2); }
+    .matrix .optional b { color: var(--lime); }
+
+    .attack-matrix {
+      min-width: 1380px;
+      display: grid;
+      grid-template-columns: repeat(11, minmax(118px, 1fr));
+      gap: 8px;
+      align-items: start;
+    }
+
+    .tactic-col {
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 10px;
+      background: rgba(4, 6, 14, 0.34);
+      overflow: hidden;
+    }
+
+    .tactic-head {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: rgba(45, 59, 84, 0.62);
+    }
+
+    .tactic-count {
+      min-width: 30px;
+      height: 22px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 999px;
+      background: rgba(4, 6, 14, 0.55);
+      color: var(--text);
+      font-size: 11px;
+    }
+
+    .technique {
+      position: relative;
+      margin: 7px;
+      padding: 9px 28px 9px 9px;
+      min-height: 58px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 7px;
+      color: #ffe9df;
+      font-size: 11px;
+      line-height: 1.28;
+    }
+
+    .technique b {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--text);
+      font-size: 11px;
+      line-height: 1.18;
+    }
+
+    .technique .tech-id {
+      display: block;
+      color: rgba(255,255,255,0.70);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .technique .tech-count {
+      position: absolute;
+      right: 8px;
+      bottom: 7px;
+      color: rgba(255,255,255,0.74);
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .heat-high { background: linear-gradient(180deg, rgba(255,77,175,0.88), rgba(146,45,132,0.82)); }
+    .heat-med { background: linear-gradient(180deg, rgba(178,167,255,0.72), rgba(91,67,154,0.76)); }
+    .heat-low { background: linear-gradient(180deg, rgba(35,245,220,0.46), rgba(22,111,121,0.70)); }
+    .heat-cool { background: linear-gradient(180deg, rgba(35,245,220,0.22), rgba(35,245,220,0.10)); }
+
+    .no-activity {
+      margin: 7px;
+      min-height: 120px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed rgba(255,255,255,0.08);
+      border-radius: 7px;
+      color: var(--faint);
+      font-size: 11px;
+      background: rgba(255,255,255,0.015);
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 7px;
+    }
+
+    .badge {
+      padding: 2px 5px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.13);
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--faint);
+    }
+
+    .badge.siem { color: var(--cyan); border-color: rgba(35,245,220,0.28); }
+    .badge.edr { color: var(--pink2); border-color: rgba(255,77,175,0.32); }
+    .badge.opt { color: var(--lime); border-color: rgba(215,255,100,0.28); }
+
+    .run-panel {
+      margin-top: 16px;
+    }
+
+    .run-body {
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 14px;
+      padding: 14px;
+    }
+
+    .note {
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 10px;
+      padding: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      background: rgba(4, 6, 14, 0.34);
+    }
+
+    .note + .note { margin-top: 10px; }
+
+    .codebox {
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(4, 6, 14, 0.62);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .code-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 13px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      color: var(--faint);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .copy {
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      border-radius: 3px;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 5px 8px;
+      cursor: pointer;
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px;
+      overflow: auto;
+      color: #efe6f4;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .source-viewer {
+      margin-top: 16px;
+    }
+
+    .source-viewer details {
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 10px;
+      background: rgba(4, 6, 14, 0.62);
+      overflow: hidden;
+    }
+
+    .source-viewer summary {
+      cursor: pointer;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      list-style: none;
+    }
+
+    .source-viewer summary::-webkit-details-marker { display: none; }
+
+    .source-tools {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      color: var(--faint);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .source-tools a {
+      color: var(--cyan);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(35,245,220,0.45);
+    }
+
+    .source-code {
+      max-height: 560px;
+      background: rgba(0,0,0,0.25);
+    }
+
+    .source-code code {
+      white-space: pre;
+    }
+
+    .py-keyword { color: var(--pink2); font-weight: 700; }
+    .py-string { color: var(--lime); }
+    .py-comment { color: var(--faint); font-style: italic; }
+    .py-number { color: var(--cyan); }
+    .sh-cmd { color: var(--pink2); font-weight: 800; }
+    .sh-var { color: var(--cyan); }
+    .sh-value { color: var(--lime); }
+    .sh-arg { color: var(--violet); }
+    .sh-path { color: var(--text); font-weight: 800; }
+
+    footer {
+      margin: 40px 0 20px;
+      text-align: center;
+      color: var(--faint);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    @media (max-width: 980px) {
+      .hero { min-height: auto; padding-top: 44px; }
+      .repo-link { position: static; margin: 14px auto 0; width: max-content; }
+      .workflow-row { grid-template-columns: 42px 74px 1fr; }
+      .replay-grid,
+      .lower,
+      .coverage-grid,
+      .run-body { grid-template-columns: 1fr; }
+      .stream-row { grid-template-columns: 52px 1fr; }
+      .stream-row span { grid-column: 2; text-align: left; }
+      .coverage-box.wide { grid-column: auto; }
+      .coverage-box.wide ul { columns: 1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <a class="repo-link" href="https://github.com/jamesspi/hf-incident-emulation" aria-label="View hf-incident-emulation on GitHub">
+      <svg viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M8 0C3.58 0 0 3.67 0 8.2c0 3.62 2.29 6.69 5.47 7.78.4.08.55-.18.55-.4 0-.2-.01-.86-.01-1.56-2.01.38-2.53-.5-2.69-.96-.09-.24-.48-.96-.82-1.16-.28-.16-.68-.55-.01-.56.63-.01 1.08.59 1.23.84.72 1.24 1.87.89 2.33.68.07-.53.28-.89.51-1.1-1.78-.21-3.64-.91-3.64-4.05 0-.89.31-1.63.82-2.2-.08-.21-.36-1.04.08-2.17 0 0 .67-.22 2.2.84A7.43 7.43 0 0 1 8 3.9c.68 0 1.36.09 2 .27 1.53-1.06 2.2-.84 2.2-.84.44 1.13.16 1.96.08 2.17.51.57.82 1.3.82 2.2 0 3.15-1.87 3.84-3.65 4.05.29.26.54.76.54 1.53 0 1.1-.01 1.99-.01 2.26 0 .22.15.48.55.4A8.12 8.12 0 0 0 16 8.2C16 3.67 12.42 0 8 0Z"/>
+      </svg>
+      GitHub
+    </a>
+    <section class="hero" aria-label="Hugging Face attack emulation hero">
+      <div class="hero-inner">
+        <div class="micro-pill">Synthetic Elastic replay for the Hugging Face incident</div>
+        <h1 class="wordmark">HF ATTACK EMU</h1>
+        <p class="tagline">▸ emulate the public incident safely.</p>
+        <h2 class="headline">A tool to emulate the Hugging Face agent intrusion in <strong>Elastic Security.</strong></h2>
+        <p class="subhead">
+          Generate safe synthetic telemetry for the public Hugging Face agent intrusion, exercise OOTB
+          Elastic Security coverage, and produce a coherent attack narrative from the resulting alerts.
+        </p>
+        <p class="source-credit">
+          Inspired by and credited to Hugging Face's public incident materials:
+          <a href="https://huggingface.co/blog/agent-intrusion-technical-timeline">technical timeline</a>
+          and
+          <a href="https://huggingface-anatomy-of-frontier-lab-model-intrusion.static.hf.space/index.html">interactive attack replay</a>.
+          This project is an independent synthetic Elastic emulation and is not affiliated with Hugging Face.
+        </p>
+        <div class="actions">
+          <button class="btn primary" id="playReplay" type="button">▸ play replay</button>
+          <button class="btn" id="restartReplay" type="button">restart</button>
+          <a class="btn secondary" href="scripts/run_hf_emulation.py">view runner</a>
+          <a class="btn" href="#coverage">coverage map →</a>
+          <a class="btn" href="#rules">optional rules →</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-kicker">// replay diagram</div>
+    <h2 class="section-title">Five stages to a coherent attack narrative.</h2>
+
+    <section class="replay-grid" aria-label="Incident replay dashboard">
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Attack chain across trust boundaries</h2>
+          <span class="chip">nodes ignite as the synthetic agent reaches them</span>
+        </div>
+        <div class="graph-wrap">
+          <svg class="graph" viewBox="0 0 1040 520" role="img" aria-label="Attack chain graph from launchpad to source control and exfiltration">
+            <defs>
+              <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ff4daf"></stop>
+                <stop offset="52%" stop-color="#d7ff64"></stop>
+                <stop offset="100%" stop-color="#23f5dc"></stop>
+              </linearGradient>
+              <linearGradient id="altGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#23f5dc"></stop>
+                <stop offset="100%" stop-color="#b2a7ff"></stop>
+              </linearGradient>
+              <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L6,3 z" fill="#d7ff64"></path>
+              </marker>
+            </defs>
+
+            <rect class="zone" x="24" y="34" width="170" height="430" rx="18"></rect>
+            <rect class="zone" x="224" y="34" width="170" height="430" rx="18"></rect>
+            <rect class="zone" x="424" y="34" width="170" height="430" rx="18"></rect>
+            <rect class="zone" x="624" y="34" width="170" height="430" rx="18"></rect>
+            <rect class="zone" x="824" y="34" width="190" height="430" rx="18"></rect>
+
+            <text class="zone-label" x="44" y="62">external</text>
+            <text class="zone-label" x="244" y="62">application</text>
+            <text class="zone-label" x="444" y="62">cluster</text>
+            <text class="zone-label" x="644" y="62">cloud / mesh</text>
+            <text class="zone-label" x="844" y="62">supply chain</text>
+
+            <circle class="stage-num" cx="42" cy="86" r="13"></circle>
+            <text class="stage-text" x="38" y="90">1</text>
+            <circle class="stage-num" cx="242" cy="86" r="13"></circle>
+            <text class="stage-text" x="238" y="90">2</text>
+            <circle class="stage-num" cx="442" cy="86" r="13"></circle>
+            <text class="stage-text" x="438" y="90">3</text>
+            <circle class="stage-num" cx="642" cy="86" r="13"></circle>
+            <text class="stage-text" x="638" y="90">4</text>
+            <circle class="stage-num" cx="842" cy="86" r="13"></circle>
+            <text class="stage-text" x="838" y="90">5</text>
+
+            <path class="edge" d="M164 176 C204 176, 216 176, 256 176"></path>
+            <path class="edge" d="M364 176 C404 176, 416 176, 456 176"></path>
+            <path class="edge" d="M564 176 C604 176, 616 142, 656 142"></path>
+            <path class="edge alt" d="M564 176 C606 176, 616 246, 656 246"></path>
+            <path class="edge alt" d="M764 246 C804 246, 816 176, 856 176"></path>
+            <path class="edge" d="M364 384 C520 520, 744 508, 856 336"></path>
+            <path class="edge alt" d="M310 222 L310 338"></path>
+            <path class="edge alt" d="M510 222 L510 338"></path>
+
+            <rect class="node hot" x="52" y="130" width="112" height="92" rx="14"></rect>
+            <text class="node-text" x="72" y="162" font-size="15" font-weight="800">Launchpad</text>
+            <text class="small" x="72" y="184">sandbox base</text>
+            <text class="small" x="72" y="202">C2 + staging</text>
+
+            <rect class="node hot" x="256" y="130" width="108" height="92" rx="14"></rect>
+            <text class="node-text" x="274" y="162" font-size="15" font-weight="800">Dataset</text>
+            <text class="node-text" x="274" y="180" font-size="15" font-weight="800">worker</text>
+            <text class="small" x="274" y="202">file disclosure</text>
+
+            <rect class="node cyan" x="256" y="338" width="108" height="76" rx="14"></rect>
+            <text class="node-text" x="274" y="370" font-size="15" font-weight="800">Dead drop</text>
+            <text class="small" x="274" y="392">dataset commits</text>
+
+            <rect class="node hot" x="456" y="130" width="108" height="92" rx="14"></rect>
+            <text class="node-text" x="474" y="162" font-size="15" font-weight="800">Kubernetes</text>
+            <text class="node-text" x="474" y="180" font-size="15" font-weight="800">API</text>
+            <text class="small" x="474" y="202">RBAC + tokens</text>
+
+            <rect class="node red" x="456" y="338" width="108" height="76" rx="14"></rect>
+            <text class="node-text" x="474" y="370" font-size="15" font-weight="800">Node root</text>
+            <text class="small" x="474" y="392">hostPath + chroot</text>
+
+            <rect class="node cyan" x="656" y="96" width="108" height="92" rx="14"></rect>
+            <text class="node-text" x="674" y="128" font-size="15" font-weight="800">Cloud IAM</text>
+            <text class="small" x="674" y="150">metadata + STS</text>
+            <text class="small" x="674" y="168">ECR, secrets</text>
+
+            <rect class="node cyan" x="656" y="220" width="108" height="92" rx="14"></rect>
+            <text class="node-text" x="674" y="252" font-size="15" font-weight="800">Tailscale</text>
+            <text class="small" x="674" y="274">userspace</text>
+            <text class="small" x="674" y="292">SOCKS proxy</text>
+
+            <rect class="node violet" x="856" y="130" width="128" height="92" rx="14"></rect>
+            <text class="node-text" x="876" y="162" font-size="15" font-weight="800">GitHub App</text>
+            <text class="small" x="876" y="184">token minting</text>
+            <text class="small" x="876" y="202">repo + CI probe</text>
+
+            <rect class="node red" x="856" y="290" width="128" height="92" rx="14"></rect>
+            <text class="node-text" x="876" y="322" font-size="15" font-weight="800">Exfiltration</text>
+            <text class="small" x="876" y="344">chunked public</text>
+            <text class="small" x="876" y="362">dead drops</text>
+          </svg>
+        </div>
+      </article>
+
+      <aside class="side">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Phase activity</h2>
+            <span class="chip">alert docs</span>
+          </div>
+          <div class="phase-list">
+            <div class="phase"><b>foothold</b><div class="bar"><i style="width:69%"></i></div><span>11</span></div>
+            <div class="phase"><b>c2/dropper</b><div class="bar"><i style="width:94%"></i></div><span>15</span></div>
+            <div class="phase"><b>recon</b><div class="bar"><i style="width:75%"></i></div><span>12</span></div>
+            <div class="phase"><b>k8s rbac</b><div class="bar"><i style="width:100%"></i></div><span>16</span></div>
+            <div class="phase"><b>node pivot</b><div class="bar"><i style="width:50%"></i></div><span>8</span></div>
+            <div class="phase"><b>cloud iam</b><div class="bar"><i style="width:100%"></i></div><span>16</span></div>
+            <div class="phase"><b>tailscale</b><div class="bar"><i style="width:69%"></i></div><span>11</span></div>
+            <div class="phase"><b>github</b><div class="bar"><i style="width:94%"></i></div><span>15</span></div>
+            <div class="phase"><b>exfil</b><div class="bar"><i style="width:100%"></i></div><span>20</span></div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Volume per day</h2>
+            <span class="chip">synthetic</span>
+          </div>
+          <div class="volume-list">
+            <div class="volume-row"><time>07-09</time><div class="bar"><i style="width:58%"></i></div><span>32</span></div>
+            <div class="volume-row"><time>07-10</time><div class="bar"><i style="width:26%"></i></div><span>14</span></div>
+            <div class="volume-row"><time>07-11</time><div class="bar"><i style="width:100%"></i></div><span>54</span></div>
+            <div class="volume-row"><time>07-12</time><div class="bar"><i style="width:72%"></i></div><span>39</span></div>
+            <div class="volume-row"><time>07-13</time><div class="bar"><i style="width:40%"></i></div><span>22</span></div>
+          </div>
+        </article>
+      </aside>
+    </section>
+
+    <section class="lower stream-only">
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Live action stream</h2>
+          <span class="chip">representative events</span>
+        </div>
+        <div class="stream-list">
+          <div class="stream-row"><time>01 ›</time><code>dataset_config_processed file.path=/proc/self/environ</code><span>foothold</span></div>
+          <div class="stream-row"><time>02 ›</time><code>python3 -c "gzip/base64 staged execution marker"</code><span>c2/dropper</span></div>
+          <div class="stream-row"><time>03 ›</time><code>env; cat /proc/self/mountinfo; getent hosts internal connector</code><span>recon</span></div>
+          <div class="stream-row"><time>04 ›</time><code>create serviceaccounts/token; create selfsubjectrulesreviews</code><span>k8s rbac</span></div>
+          <div class="stream-row"><time>05 ›</time><code>create privileged pod hostPath=/; chroot /host</code><span>node pivot</span></div>
+          <div class="stream-row"><time>06 ›</time><code>GetCallerIdentity; DescribeVpcs; ListClusters; GetAuthorizationToken</code><span>cloud iam</span></div>
+          <div class="stream-row"><time>07 ›</time><code>tailscaled --tun=userspace-networking --state=mem: --socks5-server=127.0.0.1:1055</code><span>tailscale</span></div>
+          <div class="stream-row"><time>08 ›</time><code>integration_installation_token.create; pull_request.create</code><span>github</span></div>
+          <div class="stream-row"><time>09 ›</time><code>POST encoded chunks to capture, dataset, paste, and proxy destinations</code><span>exfil</span></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel coverage" id="coverage" aria-label="Out of the box Elastic coverage">
+      <div class="panel-head">
+        <h2>Out-of-the-box Elastic coverage that would help</h2>
+        <span class="chip">primary story: SIEM + endpoint protections</span>
+      </div>
+      <div class="coverage-grid checklist-grid">
+        <div class="coverage-box wide">
+          <h3>Elastic Security / SIEM rules</h3>
+          <div class="rule-group-grid">
+            <div class="rule-group">
+              <div class="rule-group-title">Worker and GenAI host detections <span class="rule-count">9</span></div>
+              <ul>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Suspicious%20Child%20Execution%20via%20Web%20Server%22&type=code"><b>Suspicious Child Execution via Web Server</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Curl%20or%20Wget%20Spawned%20via%20Node.js%22&type=code"><b>Curl or Wget Spawned via Node.js</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Accessing%20Sensitive%20Files%22&type=code"><b>GenAI Process Accessing Sensitive Files</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Connection%20to%20Unusual%20Domain%22&type=code"><b>GenAI Process Connection to Unusual Domain</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Connection%20to%20Suspicious%20Top%20Level%20Domain%22&type=code"><b>GenAI Process Connection to Suspicious Top Level Domain</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Performing%20Encoding%2FChunking%20Prior%20to%20Network%20Activity%22&type=code"><b>GenAI Process Performing Encoding/Chunking Prior to Network Activity</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Connection%20to%20Common%20Large%20Language%20Model%20Endpoints%22&type=code"><b>Connection to Common Large Language Model Endpoints</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Unusual%20Process%20Modifying%20GenAI%20Configuration%20File%22&type=code"><b>Unusual Process Modifying GenAI Configuration File</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20CLI%20Started%20with%20Unsafe%20Permission%20Bypass%22&type=code"><b>GenAI CLI Started with Unsafe Permission Bypass</b></a></li>
+              </ul>
+            </div>
+            <div class="rule-group">
+              <div class="rule-group-title">Kubernetes, cloud, and identity <span class="rule-count">12</span></div>
+              <ul>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Denied%20Service%20Account%20Request%20via%20Unusual%20User%20Agent%22&type=code"><b>Kubernetes Denied Service Account Request via Unusual User Agent</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Suspicious%20Self-Subject%20Review%20via%20Unusual%20User%20Agent%22&type=code"><b>Kubernetes Suspicious Self-Subject Review via Unusual User Agent</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Multi-Resource%20Discovery%22&type=code"><b>Kubernetes Multi-Resource Discovery</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Secret%20get%20or%20list%20with%20Suspicious%20User%20Agent%22&type=code"><b>Kubernetes Secret get or list with Suspicious User Agent</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Secret%20get%20or%20list%20from%20Node%20or%20Pod%20Service%20Account%22&type=code"><b>Kubernetes Secret get or list from Node or Pod Service Account</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Service%20Account%20Token%20Created%20via%20TokenRequest%20API%22&type=code"><b>Kubernetes Service Account Token Created via TokenRequest API</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Direct%20API%20Request%20via%20Curl%20or%20Wget%22&type=code"><b>Kubernetes Direct API Request via Curl or Wget</b></a></li>
+                <li><a href="https://github.com/elastic/detection-rules/blob/main/rules/integrations/kubernetes/privilege_escalation_privileged_pod_created.toml"><b>Kubernetes Privileged Pod Created</b></a></li>
+                <li><a href="https://github.com/elastic/detection-rules/blob/main/rules/integrations/kubernetes/privilege_escalation_pod_created_with_sensitive_hostpath_volume.toml"><b>Kubernetes Pod Created with a Sensitive hostPath Volume</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22AWS%20Discovery%20API%20Calls%20via%20CLI%20from%20a%20Single%20Resource%22&type=code"><b>AWS Discovery API Calls via CLI from a Single Resource</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22AWS%20STS%20GetCallerIdentity%20API%20Called%20for%20the%20First%20Time%22&type=code"><b>AWS STS GetCallerIdentity API Called for the First Time</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22AWS%20EC2%20Role%20GetCallerIdentity%20from%20New%20Source%20AS%20Organization%22&type=code"><b>AWS EC2 Role GetCallerIdentity from New Source AS Organization</b></a></li>
+              </ul>
+            </div>
+            <div class="rule-group">
+              <div class="rule-group-title">Correlation and triage <span class="rule-count">2</span></div>
+              <ul>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Elastic%20Defend%20Alert%20from%20GenAI%20Utility%20or%20Descendant%22&type=code"><b>Elastic Defend Alert from GenAI Utility or Descendant</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22LLM-Based%20Attack%20Chain%20Triage%20by%20Host%22&type=code"><b>LLM-Based Attack Chain Triage by Host</b></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="coverage-box">
+          <h3>Elastic Defend endpoint protections</h3>
+          <div class="rule-group-grid single">
+            <div class="rule-group">
+              <div class="rule-group-title">Execution and payload behavior <span class="rule-count">5</span></div>
+              <ul>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Suspicious%20Web%20Server%20Child%20Process%22&type=code"><b>Suspicious Web Server Child Process</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Payload%20Downloaded%20via%20Curl%20or%20Wget%20by%20Web%20Server%22&type=code"><b>Payload Downloaded via Curl or Wget by Web Server</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Payload%20Execution%20by%20Web%20Server%22&type=code"><b>Payload Execution by Web Server</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Payload%20Execution%20by%20Node.js%20Web%20Server%22&type=code"><b>Payload Execution by Node.js Web Server</b></a></li>
+                <li><a href="https://github.com/elastic/protections-artifacts/blob/main/behavior/rules/linux/defense_evasion_decoded_payload_piped_to_interpreter.toml"><b>Decoded Payload Piped to Interpreter</b></a></li>
+              </ul>
+            </div>
+            <div class="rule-group">
+              <div class="rule-group-title">Credential collection and persistence <span class="rule-count">5</span></div>
+              <ul>
+                <li><a href="https://github.com/elastic/protections-artifacts/blob/main/behavior/rules/linux/execution_suspicious_python_encoded_payload_execution.toml"><b>Suspicious Python Encoded Payload Execution</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Environment%20Variable%20Secret%20Collection%22&type=code"><b>Environment Variable Secret Collection</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Multi-Value%20Secret%20Searching%20via%20Grep%22&type=code"><b>Multi-Value Secret Searching via Grep</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Cloud%20Credential%20Files%20Accessed%20by%20Process%20in%20Suspicious%20Directory%22&type=code"><b>Cloud Credential Files Accessed by Process in Suspicious Directory</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Persistence%20via%20GenAI%20Tool%22&type=code"><b>Persistence via GenAI Tool</b></a></li>
+              </ul>
+            </div>
+            <div class="rule-group">
+              <div class="rule-group-title">Egress and suspicious binaries <span class="rule-count">2</span></div>
+              <ul>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22DNS%20Request%20by%20Recently%20Created%20Executable%22&type=code"><b>DNS Request by Recently Created Executable</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Suspicious%20Binary%20Execution%20via%20Path%20Alias%22&type=code"><b>Suspicious Binary Execution via Path Alias</b></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel mitre" id="mitre" aria-label="MITRE ATT&CK coverage matrix">
+      <div class="panel-head">
+        <h2>MITRE ATT&CK coverage matrix</h2>
+        <span class="chip">SIEM + endpoint + optional generated rules</span>
+      </div>
+      <div class="mitre-legend" aria-label="MITRE matrix legend">
+        <div class="legend-row">
+          <span class="legend-label">Card color:</span>
+          <span class="legend-item"><span class="legend-swatch high"></span>more synthetic activity in this tactic</span>
+          <span class="legend-item"><span class="legend-swatch med"></span>some activity</span>
+          <span class="legend-item"><span class="legend-swatch low"></span>lower activity</span>
+        </div>
+        <div class="legend-row">
+          <span class="legend-label">Coverage badge:</span>
+          <span class="legend-item"><span class="badge siem">SIEM</span>alert rules from Elastic Security</span>
+          <span class="legend-item"><span class="badge edr">EDR</span>endpoint protections from Elastic Defend</span>
+          <span class="legend-item"><span class="badge opt">OPT</span>optional generated rules from this kit</span>
+        </div>
+      </div>
+      <div class="matrix-wrap">
+        <div class="attack-matrix">
+          <div class="tactic-col">
+            <div class="tactic-head"><span>Initial Access</span><span class="tactic-count">3</span></div>
+            <div class="technique heat-high"><b>Exploit Public-Facing App</b><span class="tech-id">T1190</span><span class="tech-count">11</span></div>
+            <div class="technique heat-med"><b>Supply Chain Compromise</b><span class="tech-id">T1195</span><span class="tech-count">5</span></div>
+            <div class="technique heat-low"><b>External Remote Services</b><span class="tech-id">T1133</span><span class="tech-count">3</span></div>
+          </div>
+          <div class="tactic-col">
+            <div class="tactic-head"><span>Execution</span><span class="tactic-count">4</span></div>
+            <div class="technique heat-high"><b>Command and Scripting Interpreter</b><span class="tech-id">T1059</span><span class="tech-count">15</span></div>
+            <div class="technique heat-med"><b>Python</b><span class="tech-id">T1059.006</span><span class="tech-count">8</span></div>
+            <div class="technique heat-med"><b>Unix Shell</b><span class="tech-id">T1059.004</span><span class="tech-count">6</span></div>
+            <div class="technique heat-low"><b>User Execution</b><span class="tech-id">T1204</span><span class="tech-count">3</span></div>
+          </div>
+          <div class="tactic-col">
+            <div class="tactic-head"><span>Persistence</span><span class="tactic-count">2</span></div>
+            <div class="technique heat-med"><b>External Proxy</b><span class="tech-id">T1090</span><span class="tech-count">4</span></div>
+            <div class="technique heat-low"><b>Create Account / Token</b><span class="tech-id">T1136</span><span class="tech-count">2</span></div>
+          </div>
+          <div class="tactic-col">
+            <div class="tactic-head"><span>Privilege Esc.</span><span class="tactic-count">4</span></div>
+            <div class="technique heat-high"><b>Escape to Host</b><span class="tech-id">T1611</span><span class="tech-count">8</span></div>
+            <div class="technique heat-med"><b>Additional Cloud Roles</b><span class="tech-id">T1098.003</span><span class="tech-count">5</span></div>
+            <div class="technique heat-med"><b>Valid Accounts</b><span class="tech-id">T1078</span><span class="tech-count">4</span></div>
+            <div class="technique heat-low"><b>Sudo Chroot Attempt</b><span class="tech-id">CVE-2025-32463</span><span class="tech-count">2</span></div>
+          </div>
+          <div class="tactic-col">
+            <div class="tactic-head"><span>Stealth</span><span class="tactic-count">0</span></div>
+            <div class="no-activity">No activity</div>
+          </div>
+          <div class="tactic-col">
+            <div class="tactic-head"><span>Credential Access</span><span class="tactic-count">6</span></div>
+            <div class="technique heat-high"><b>Unsecured Credentials</b><span class="tech-id">T1552</span><span class="tech-count">16</span></div>
+            <div class="technique heat-high"><b>Cloud Credentials</b><span class="tech-id">T1552.005</span><span class="tech-count">9</span></div>
+            <div class="technique heat-med"><b>Proc Filesystem</b><span class="tech-id">procfs</span><span class="tech-count">7</span></div>
+            <div class="technique heat-med"><b>Secrets Manager</b><span class="tech-id">GetSecretValue</span><span class="tech-count">5</span></div>
+          </div>
+          <div class="tactic-col">
+            <div class="tactic-head"><span>Discovery</span><span class="tactic-count">5</span></div>
+            <div class="technique heat-high"><b>Cloud Service Discovery</b><span class="tech-id">T1526</span><span class="tech-count">16</span></div>
+            <div class="technique heat-med"><b>Permission Groups Discovery</b><span class="tech-id">T1069</span><span class="tech-count">12</span></div>
+            <div class="technique heat-low"><b>System Information Discovery</b><span class="tech-id">T1082</span><span class="tech-count">6</span></div>
+          </div>
+          <div class="tactic-col">
+            <div class="tactic-head"><span>Lateral Movement</span><span class="tactic-count">3</span></div>
+            <div class="technique heat-high"><b>Proxy / Tunnel</b><span class="tech-id">T1090</span><span class="tech-count">11</span></div>
+            <div class="technique heat-med"><b>Remote Services</b><span class="tech-id">T1021</span><span class="tech-count">4</span></div>
+          </div>
+          <div class="tactic-col">
+            <div class="tactic-head"><span>C2</span><span class="tactic-count">5</span></div>
+            <div class="technique heat-high"><b>Ingress Tool Transfer</b><span class="tech-id">T1105</span><span class="tech-count">15</span></div>
+            <div class="technique heat-med"><b>Proxy</b><span class="tech-id">T1090</span><span class="tech-count">11</span></div>
+            <div class="technique heat-low"><b>Web Service</b><span class="tech-id">T1102</span><span class="tech-count">6</span></div>
+          </div>
+          <div class="tactic-col">
+            <div class="tactic-head"><span>Exfiltration</span><span class="tactic-count">3</span></div>
+            <div class="technique heat-high"><b>Exfiltration Over C2 Channel</b><span class="tech-id">T1041</span><span class="tech-count">20</span></div>
+            <div class="technique heat-med"><b>Exfiltration to Cloud Storage</b><span class="tech-id">T1537</span><span class="tech-count">7</span></div>
+            <div class="technique heat-low"><b>Source Code Exfiltration</b><span class="tech-id">git.clone</span><span class="tech-count">5</span></div>
+          </div>
+          <div class="tactic-col">
+            <div class="tactic-head"><span>Impact</span><span class="tactic-count">0</span></div>
+            <div class="no-activity">No destructive activity</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="rules" aria-label="Optional generated SIEM rules">
+      <div class="panel-head">
+        <h2>Optional generated SIEM rules</h2>
+        <span class="chip">add-on content</span>
+      </div>
+      <div class="rules-list">
+        <div class="rule"><b><a href="scripts/run_hf_emulation.py">Dataset Worker Local File Disclosure via External Reference</a></b><span>generated locally</span></div>
+        <div class="rule"><b><a href="scripts/run_hf_emulation.py">Python Gzip Base64 Payload Execution</a></b><span>generated locally</span></div>
+        <div class="rule"><b><a href="scripts/run_hf_emulation.py">Linux Service Account Token and Environment Discovery</a></b><span>generated locally</span></div>
+        <div class="rule"><b><a href="scripts/run_hf_emulation.py">Kubernetes Service Account TokenRequest and RBAC Review</a></b><span>generated locally</span></div>
+        <div class="rule"><b><a href="scripts/run_hf_emulation.py">Kubernetes Privileged Pod Created With HostPath Mount</a></b><span>generated locally</span></div>
+        <div class="rule"><b><a href="scripts/run_hf_emulation.py">Cloud Metadata Credential Access Followed by IAM Enumeration</a></b><span>generated locally</span></div>
+        <div class="rule"><b><a href="scripts/run_hf_emulation.py">Tailscale Userspace Networking Proxy Started</a></b><span>generated locally</span></div>
+        <div class="rule"><b><a href="scripts/run_hf_emulation.py">GitHub App Installation Token Created and Repository Access</a></b><span>generated locally</span></div>
+        <div class="rule"><b><a href="scripts/run_hf_emulation.py">Chunked Exfiltration to Public Dead-Drop Services</a></b><span>generated locally</span></div>
+      </div>
+    </section>
+
+    <section class="panel run-panel" id="run">
+      <div class="panel-head">
+        <h2>Run this replay against Elastic</h2>
+        <span class="chip">self-hosted · API driven · tagged</span>
+      </div>
+      <div class="run-body">
+        <div>
+          <div class="note"><b>Creates:</b> <code>logs-frontier_lab_agent_emulation.*</code> data streams designed to exercise OOTB coverage first.</div>
+          <div class="note"><b>Scopes:</b> every run with <code>frontier-lab-agent-emulation-run-&lt;timestamp&gt;</code>.</div>
+          <div class="note"><b>Optional:</b> add <code>--include-custom-rules</code> to create the generated gap-filler rules shown above.</div>
+          <div class="note"><b>Connector:</b> run <code>--list-connectors</code>, then choose one with <code>--connector-name</code> or <code>--connector-id</code>/<code>--connector-type</code>.</div>
+        </div>
+        <div class="codebox">
+          <div class="code-head">
+            <span>recommended command</span>
+            <button class="copy" data-copy="run-command">copy</button>
+          </div>
+          <pre id="run-command"><code class="language-bash"><span class="sh-cmd">export</span> <span class="sh-var">ELASTIC_USERNAME</span>=<span class="sh-value">"elastic-user"</span>
+<span class="sh-cmd">export</span> <span class="sh-var">ELASTIC_PASSWORD</span>=<span class="sh-value">"elastic-password"</span>
+
+<span class="sh-cmd">python3</span> <span class="sh-path">scripts/run_hf_emulation.py</span> \
+  <span class="sh-arg">--es-url</span> <span class="sh-value">http://localhost:9200</span> \
+  <span class="sh-arg">--kibana-url</span> <span class="sh-value">http://localhost:5601</span> \
+  <span class="sh-arg">--space</span> <span class="sh-value">default</span></code></pre>
+        </div>
+      </div>
+      <div class="source-viewer">
+        <details>
+          <summary>View full Python runner script</summary>
+          <div class="source-tools">
+            <span>language: python</span>
+            <a href="scripts/run_hf_emulation.py">open script source</a>
+          </div>
+          <pre class="source-code"><code id="runnerSource" class="language-python">Loading scripts/run_hf_emulation.py...</code></pre>
+        </details>
+      </div>
+    </section>
+
+    <footer>
+      Synthetic emulation kit for Elastic Security. Telemetry only, no exploitation.
+    </footer>
+  </main>
+
+  <script>
+    const replayState = {
+      index: 0,
+      timer: null,
+      nodeMap: [0, 1, 1, 2, 4, 5, 6, 7, 8],
+    };
+
+    const playButton = document.getElementById("playReplay");
+    const restartButton = document.getElementById("restartReplay");
+    const streamRows = Array.from(document.querySelectorAll(".stream-row"));
+    const phases = Array.from(document.querySelectorAll(".phase"));
+    const graphNodes = Array.from(document.querySelectorAll(".graph .node"));
+    const workflowRows = Array.from(document.querySelectorAll(".workflow-row"));
+
+    function setReplayStep(index) {
+      replayState.index = index % streamRows.length;
+
+      streamRows.forEach((row, i) => row.classList.toggle("is-active", i === replayState.index));
+      phases.forEach((phase, i) => phase.classList.toggle("is-active", i === replayState.index));
+      workflowRows.forEach((row, i) => row.classList.toggle("is-active", i === replayState.index % workflowRows.length));
+
+      graphNodes.forEach((node, i) => {
+        node.classList.toggle("is-active", i === replayState.nodeMap[replayState.index]);
+      });
+    }
+
+    function startReplay() {
+      window.clearInterval(replayState.timer);
+      playButton.textContent = "playing...";
+      setReplayStep(replayState.index);
+      replayState.timer = window.setInterval(() => {
+        setReplayStep(replayState.index + 1);
+        if (replayState.index === streamRows.length - 1) {
+          window.clearInterval(replayState.timer);
+          playButton.textContent = "▸ play replay";
+        }
+      }, 850);
+    }
+
+    function restartReplay() {
+      window.clearInterval(replayState.timer);
+      playButton.textContent = "▸ play replay";
+      setReplayStep(0);
+    }
+
+    playButton?.addEventListener("click", startReplay);
+    restartButton?.addEventListener("click", restartReplay);
+    setReplayStep(0);
+
+    document.querySelectorAll(".copy").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const target = document.getElementById(button.dataset.copy);
+        if (!target) return;
+        try {
+          await navigator.clipboard.writeText(target.innerText);
+          const original = button.textContent;
+          button.textContent = "copied";
+          setTimeout(() => { button.textContent = original; }, 1200);
+        } catch {
+          button.textContent = "select";
+        }
+      });
+    });
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function highlightPython(source) {
+      let html = escapeHtml(source);
+      html = html.replace(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g, '<span class="py-string">$1</span>');
+      html = html.replace(/\b(False|None|True|and|as|assert|async|await|break|class|continue|def|elif|else|except|finally|for|from|if|import|in|is|lambda|not|or|pass|raise|return|try|while|with|yield)\b/g, '<span class="py-keyword">$1</span>');
+      html = html.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="py-number">$1</span>');
+      html = html.replace(/(^|\n)([^\n]*?)(#.*?)(?=\n|$)/g, (match, start, before, comment) => `${start}${before}<span class="py-comment">${comment}</span>`);
+      return html;
+    }
+
+    async function loadRunnerSource() {
+      const target = document.getElementById("runnerSource");
+      if (!target) return;
+      try {
+        const response = await fetch("scripts/run_hf_emulation.py");
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const source = await response.text();
+        target.innerHTML = highlightPython(source);
+      } catch (error) {
+        target.textContent = "Unable to load the embedded script preview here. Use the source link above to open scripts/run_hf_emulation.py.";
+      }
+    }
+
+    loadRunnerSource();
+  </script>
+</body>
+</html>
