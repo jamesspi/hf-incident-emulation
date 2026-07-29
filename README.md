@@ -4,32 +4,12 @@ A safe, synthetic Elastic Security emulation kit for the public Hugging Face age
 
 This repository contains:
 
-- A GitHub Pages-ready explainer site in `index.html`
 - A portable Python runner in `scripts/run_hf_emulation.py`
 - Synthetic telemetry shaped around the public Hugging Face incident
 - Out-of-box Elastic Security and Elastic Defend coverage mapping
 - Optional generated SIEM rules for test clusters that need extra alert signal
 
 > This project is an independent synthetic Elastic emulation. It is not affiliated with Hugging Face.
-
-## Live Site
-
-This repo is prepared for GitHub Pages with the custom domain:
-
-```text
-hf-incident.threatsearch.io
-```
-
-GitHub Pages files:
-
-- `CNAME` points to `hf-incident.threatsearch.io`
-- `.nojekyll` disables Jekyll processing for static assets/files
-
-Repository URL:
-
-```text
-https://github.com/jamesspi/hf-incident-emulation
-```
 
 ## Credit
 
