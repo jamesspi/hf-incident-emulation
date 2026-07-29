@@ -82,46 +82,46 @@ This keeps the default story focused on Elastic's out-of-box SIEM and endpoint c
 
 The relevant SIEM rule coverage includes:
 
-- Suspicious Child Execution via Web Server
-- Curl or Wget Spawned via Node.js
-- GenAI Process Accessing Sensitive Files
-- GenAI Process Connection to Unusual Domain
-- GenAI Process Connection to Suspicious Top Level Domain
-- GenAI Process Performing Encoding/Chunking Prior to Network Activity
-- Connection to Common Large Language Model Endpoints
-- Unusual Process Modifying GenAI Configuration File
-- GenAI CLI Started with Unsafe Permission Bypass
-- Elastic Defend Alert from GenAI Utility or Descendant
-- LLM-Based Attack Chain Triage by Host
-- Kubernetes Denied Service Account Request via Unusual User Agent
-- Kubernetes Suspicious Self-Subject Review via Unusual User Agent
-- Kubernetes Multi-Resource Discovery
-- Kubernetes Secret get or list with Suspicious User Agent
-- Kubernetes Secret get or list from Node or Pod Service Account
-- Kubernetes Service Account Token Created via TokenRequest API
-- Kubernetes Direct API Request via Curl or Wget
+- [Suspicious Child Execution via Web Server](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Suspicious%20Child%20Execution%20via%20Web%20Server%22&type=code)
+- [Curl or Wget Spawned via Node.js](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Curl%20or%20Wget%20Spawned%20via%20Node.js%22&type=code)
+- [GenAI Process Accessing Sensitive Files](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Accessing%20Sensitive%20Files%22&type=code)
+- [GenAI Process Connection to Unusual Domain](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Connection%20to%20Unusual%20Domain%22&type=code)
+- [GenAI Process Connection to Suspicious Top Level Domain](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Connection%20to%20Suspicious%20Top%20Level%20Domain%22&type=code)
+- [GenAI Process Performing Encoding/Chunking Prior to Network Activity](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Performing%20Encoding%2FChunking%20Prior%20to%20Network%20Activity%22&type=code)
+- [Connection to Common Large Language Model Endpoints](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Connection%20to%20Common%20Large%20Language%20Model%20Endpoints%22&type=code)
+- [Unusual Process Modifying GenAI Configuration File](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Unusual%20Process%20Modifying%20GenAI%20Configuration%20File%22&type=code)
+- [GenAI CLI Started with Unsafe Permission Bypass](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20CLI%20Started%20with%20Unsafe%20Permission%20Bypass%22&type=code)
+- [Elastic Defend Alert from GenAI Utility or Descendant](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Elastic%20Defend%20Alert%20from%20GenAI%20Utility%20or%20Descendant%22&type=code)
+- [LLM-Based Attack Chain Triage by Host](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22LLM-Based%20Attack%20Chain%20Triage%20by%20Host%22&type=code)
+- [Kubernetes Denied Service Account Request via Unusual User Agent](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Denied%20Service%20Account%20Request%20via%20Unusual%20User%20Agent%22&type=code)
+- [Kubernetes Suspicious Self-Subject Review via Unusual User Agent](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Suspicious%20Self-Subject%20Review%20via%20Unusual%20User%20Agent%22&type=code)
+- [Kubernetes Multi-Resource Discovery](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Multi-Resource%20Discovery%22&type=code)
+- [Kubernetes Secret get or list with Suspicious User Agent](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Secret%20get%20or%20list%20with%20Suspicious%20User%20Agent%22&type=code)
+- [Kubernetes Secret get or list from Node or Pod Service Account](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Secret%20get%20or%20list%20from%20Node%20or%20Pod%20Service%20Account%22&type=code)
+- [Kubernetes Service Account Token Created via TokenRequest API](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Service%20Account%20Token%20Created%20via%20TokenRequest%20API%22&type=code)
+- [Kubernetes Direct API Request via Curl or Wget](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Direct%20API%20Request%20via%20Curl%20or%20Wget%22&type=code)
 - [Kubernetes Privileged Pod Created](https://github.com/elastic/detection-rules/blob/main/rules/integrations/kubernetes/privilege_escalation_privileged_pod_created.toml)
 - [Kubernetes Pod Created with a Sensitive hostPath Volume](https://github.com/elastic/detection-rules/blob/main/rules/integrations/kubernetes/privilege_escalation_pod_created_with_sensitive_hostpath_volume.toml)
-- AWS Discovery API Calls via CLI from a Single Resource
-- AWS STS GetCallerIdentity API Called for the First Time
-- AWS EC2 Role GetCallerIdentity from New Source AS Organization
+- [AWS Discovery API Calls via CLI from a Single Resource](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22AWS%20Discovery%20API%20Calls%20via%20CLI%20from%20a%20Single%20Resource%22&type=code)
+- [AWS STS GetCallerIdentity API Called for the First Time](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22AWS%20STS%20GetCallerIdentity%20API%20Called%20for%20the%20First%20Time%22&type=code)
+- [AWS EC2 Role GetCallerIdentity from New Source AS Organization](https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22AWS%20EC2%20Role%20GetCallerIdentity%20from%20New%20Source%20AS%20Organization%22&type=code)
 
 ## Elastic Defend Endpoint Protections
 
 The relevant endpoint-side protection coverage includes:
 
-- Suspicious Web Server Child Process
-- Payload Downloaded via Curl or Wget by Web Server
-- Payload Execution by Web Server
-- Payload Execution by Node.js Web Server
+- [Suspicious Web Server Child Process](https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Suspicious%20Web%20Server%20Child%20Process%22&type=code)
+- [Payload Downloaded via Curl or Wget by Web Server](https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Payload%20Downloaded%20via%20Curl%20or%20Wget%20by%20Web%20Server%22&type=code)
+- [Payload Execution by Web Server](https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Payload%20Execution%20by%20Web%20Server%22&type=code)
+- [Payload Execution by Node.js Web Server](https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Payload%20Execution%20by%20Node.js%20Web%20Server%22&type=code)
 - [Decoded Payload Piped to Interpreter](https://github.com/elastic/protections-artifacts/blob/main/behavior/rules/linux/defense_evasion_decoded_payload_piped_to_interpreter.toml)
 - [Suspicious Python Encoded Payload Execution](https://github.com/elastic/protections-artifacts/blob/main/behavior/rules/linux/execution_suspicious_python_encoded_payload_execution.toml)
-- DNS Request by Recently Created Executable
-- Environment Variable Secret Collection
-- Multi-Value Secret Searching via Grep
-- Cloud Credential Files Accessed by Process in Suspicious Directory
-- Persistence via GenAI Tool
-- Suspicious Binary Execution via Path Alias
+- [DNS Request by Recently Created Executable](https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22DNS%20Request%20by%20Recently%20Created%20Executable%22&type=code)
+- [Environment Variable Secret Collection](https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Environment%20Variable%20Secret%20Collection%22&type=code)
+- [Multi-Value Secret Searching via Grep](https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Multi-Value%20Secret%20Searching%20via%20Grep%22&type=code)
+- [Cloud Credential Files Accessed by Process in Suspicious Directory](https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Cloud%20Credential%20Files%20Accessed%20by%20Process%20in%20Suspicious%20Directory%22&type=code)
+- [Persistence via GenAI Tool](https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Persistence%20via%20GenAI%20Tool%22&type=code)
+- [Suspicious Binary Execution via Path Alias](https://github.com/search?q=repo%3Aelastic%2Fprotections-artifacts+%22Suspicious%20Binary%20Execution%20via%20Path%20Alias%22&type=code)
 
 ## Optional Generated Rules
 
