@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="HF incident emulation">
+  <defs>
+    <linearGradient id="g" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff4daf"/>
+      <stop offset="0.55" stop-color="#b2a7ff"/>
+      <stop offset="1" stop-color="#23f5dc"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#070314"/>
+  <path d="M13 45V19h7v10h10V19h7v26h-7V35H20v10h-7Zm30 0V19h17v6H50v5h9v6h-9v9h-7Z" fill="url(#g)"/>
+  <rect x="3" y="3" width="58" height="58" rx="12" fill="none" stroke="#ff4daf" stroke-opacity=".42" stroke-width="2"/>
+</svg>
