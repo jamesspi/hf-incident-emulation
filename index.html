@@ -1115,43 +1115,64 @@
       <div class="coverage-grid checklist-grid">
         <div class="coverage-box wide">
           <h3>Elastic Security / SIEM rules</h3>
+          <p style="margin:0 0 12px;color:var(--muted);font-size:12px;line-height:1.55;">
+            Rules marked <b style="color:var(--cyan);">fired live</b> are actively exercised: the kit writes precisely-shaped ECS telemetry to the
+            real integration data streams and confirms each one produces alerts &mdash; 25 verified firing against the Elastic 9.x prebuilt package.
+            Rules under <b style="color:var(--lime);">reference coverage</b> are relevant to this incident and stay listed for context, but this kit does
+            not trigger them via synthetic ingestion on this stack (the per-item note says why).
+          </p>
           <div class="rule-group-grid">
             <div class="rule-group">
-              <div class="rule-group-title">Worker and GenAI host detections <span class="rule-count">9</span></div>
+              <div class="rule-group-title">Worker &amp; host execution &mdash; fired live <span class="rule-count">8</span></div>
               <ul>
                 <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Suspicious%20Child%20Execution%20via%20Web%20Server%22&type=code"><b>Suspicious Child Execution via Web Server</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Suspicious%20Command%20Execution%20via%20Web%20Server%22&type=code"><b>Suspicious Command Execution via Web Server</b></a></li>
                 <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Curl%20or%20Wget%20Spawned%20via%20Node.js%22&type=code"><b>Curl or Wget Spawned via Node.js</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Accessing%20Sensitive%20Files%22&type=code"><b>GenAI Process Accessing Sensitive Files</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Connection%20to%20Unusual%20Domain%22&type=code"><b>GenAI Process Connection to Unusual Domain</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Connection%20to%20Suspicious%20Top%20Level%20Domain%22&type=code"><b>GenAI Process Connection to Suspicious Top Level Domain</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Performing%20Encoding%2FChunking%20Prior%20to%20Network%20Activity%22&type=code"><b>GenAI Process Performing Encoding/Chunking Prior to Network Activity</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Connection%20to%20Common%20Large%20Language%20Model%20Endpoints%22&type=code"><b>Connection to Common Large Language Model Endpoints</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Unusual%20Process%20Modifying%20GenAI%20Configuration%20File%22&type=code"><b>Unusual Process Modifying GenAI Configuration File</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Base64%20Decoded%20Payload%20Piped%20to%20Interpreter%22&type=code"><b>Base64 Decoded Payload Piped to Interpreter</b></a></li>
                 <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20CLI%20Started%20with%20Unsafe%20Permission%20Bypass%22&type=code"><b>GenAI CLI Started with Unsafe Permission Bypass</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20and%20Cloud%20Credential%20Path%20Access%20via%20Process%20Arguments%22&type=code"><b>Kubernetes and Cloud Credential Path Access via Process Arguments</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Curl%20SOCKS%20Proxy%20Activity%20from%20Unusual%20Parent%22&type=code"><b>Curl SOCKS Proxy Activity from Unusual Parent</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Potential%20Linux%20Tunneling%20and/or%20Port%20Forwarding%20via%20Command%20Line%22&type=code"><b>Potential Linux Tunneling and/or Port Forwarding via Command Line</b></a></li>
               </ul>
             </div>
             <div class="rule-group">
-              <div class="rule-group-title">Kubernetes, cloud, and identity <span class="rule-count">12</span></div>
+              <div class="rule-group-title">Kubernetes audit &amp; API &mdash; fired live <span class="rule-count">13</span></div>
               <ul>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Direct%20API%20Request%20via%20Curl%20or%20Wget%22&type=code"><b>Kubernetes Direct API Request via Curl or Wget</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Service%20Account%20Token%20Created%20via%20TokenRequest%20API%22&type=code"><b>Kubernetes Service Account Token Created via TokenRequest API</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Secret%20get%20or%20list%20with%20Suspicious%20User%20Agent%22&type=code"><b>Kubernetes Secret get or list with Suspicious User Agent</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Secret%20get%20or%20list%20from%20Node%20or%20Pod%20Service%20Account%22&type=code"><b>Kubernetes Secret get or list from Node or Pod Service Account</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Secrets%20List%20Across%20Cluster%20or%20Sensitive%20Namespaces%22&type=code"><b>Kubernetes Secrets List Across Cluster or Sensitive Namespaces</b></a></li>
+                <li><a href="https://github.com/elastic/detection-rules/blob/main/rules/integrations/kubernetes/privilege_escalation_privileged_pod_created.toml"><b>Kubernetes Privileged Pod Created</b></a></li>
+                <li><a href="https://github.com/elastic/detection-rules/blob/main/rules/integrations/kubernetes/privilege_escalation_pod_created_with_sensitive_hostpath_volume.toml"><b>Kubernetes Pod Created with a Sensitive hostPath Volume</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Pod%20Created%20With%20HostPID%22&type=code"><b>Kubernetes Pod Created With HostPID</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Pod%20Created%20With%20HostNetwork%22&type=code"><b>Kubernetes Pod Created With HostNetwork</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Pod%20Created%20With%20HostIPC%22&type=code"><b>Kubernetes Pod Created With HostIPC</b></a></li>
                 <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Denied%20Service%20Account%20Request%20via%20Unusual%20User%20Agent%22&type=code"><b>Kubernetes Denied Service Account Request via Unusual User Agent</b></a></li>
                 <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Suspicious%20Self-Subject%20Review%20via%20Unusual%20User%20Agent%22&type=code"><b>Kubernetes Suspicious Self-Subject Review via Unusual User Agent</b></a></li>
                 <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Multi-Resource%20Discovery%22&type=code"><b>Kubernetes Multi-Resource Discovery</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Secret%20get%20or%20list%20with%20Suspicious%20User%20Agent%22&type=code"><b>Kubernetes Secret get or list with Suspicious User Agent</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Secret%20get%20or%20list%20from%20Node%20or%20Pod%20Service%20Account%22&type=code"><b>Kubernetes Secret get or list from Node or Pod Service Account</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Service%20Account%20Token%20Created%20via%20TokenRequest%20API%22&type=code"><b>Kubernetes Service Account Token Created via TokenRequest API</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Kubernetes%20Direct%20API%20Request%20via%20Curl%20or%20Wget%22&type=code"><b>Kubernetes Direct API Request via Curl or Wget</b></a></li>
-                <li><a href="https://github.com/elastic/detection-rules/blob/main/rules/integrations/kubernetes/privilege_escalation_privileged_pod_created.toml"><b>Kubernetes Privileged Pod Created</b></a></li>
-                <li><a href="https://github.com/elastic/detection-rules/blob/main/rules/integrations/kubernetes/privilege_escalation_pod_created_with_sensitive_hostpath_volume.toml"><b>Kubernetes Pod Created with a Sensitive hostPath Volume</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22AWS%20Discovery%20API%20Calls%20via%20CLI%20from%20a%20Single%20Resource%22&type=code"><b>AWS Discovery API Calls via CLI from a Single Resource</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22AWS%20STS%20GetCallerIdentity%20API%20Called%20for%20the%20First%20Time%22&type=code"><b>AWS STS GetCallerIdentity API Called for the First Time</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22AWS%20EC2%20Role%20GetCallerIdentity%20from%20New%20Source%20AS%20Organization%22&type=code"><b>AWS EC2 Role GetCallerIdentity from New Source AS Organization</b></a></li>
               </ul>
             </div>
             <div class="rule-group">
-              <div class="rule-group-title">Correlation and triage <span class="rule-count">2</span></div>
+              <div class="rule-group-title">Cloud / AWS identity &mdash; fired live <span class="rule-count">4</span></div>
               <ul>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Elastic%20Defend%20Alert%20from%20GenAI%20Utility%20or%20Descendant%22&type=code"><b>Elastic Defend Alert from GenAI Utility or Descendant</b></a></li>
-                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22LLM-Based%20Attack%20Chain%20Triage%20by%20Host%22&type=code"><b>LLM-Based Attack Chain Triage by Host</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22AWS%20AssumeRoleWithWebIdentity%20from%20Kubernetes%20SA%20and%20External%20ASN%22&type=code"><b>AWS AssumeRoleWithWebIdentity from Kubernetes SA and External ASN</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22AWS%20STS%20GetCallerIdentity%20API%20Called%20for%20the%20First%20Time%22&type=code"><b>AWS STS GetCallerIdentity API Called for the First Time</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22AWS%20EC2%20Role%20GetCallerIdentity%20from%20New%20Source%20AS%20Organization%22&type=code"><b>AWS EC2 Role GetCallerIdentity from New Source AS Organization</b></a></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22AWS%20Discovery%20API%20Calls%20via%20CLI%20from%20a%20Single%20Resource%22&type=code"><b>AWS Discovery API Calls via CLI from a Single Resource</b></a></li>
+              </ul>
+            </div>
+            <div class="rule-group">
+              <div class="rule-group-title">Reference coverage &mdash; not triggered by this kit <span class="rule-count">8</span></div>
+              <ul>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Accessing%20Sensitive%20Files%22&type=code"><b>GenAI Process Accessing Sensitive Files</b></a> <span style="color:var(--faint);">&mdash; needs endpoint file events</span></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Connection%20to%20Unusual%20Domain%22&type=code"><b>GenAI Process Connection to Unusual Domain</b></a> <span style="color:var(--faint);">&mdash; new_terms, macOS network</span></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Connection%20to%20Suspicious%20Top%20Level%20Domain%22&type=code"><b>GenAI Process Connection to Suspicious Top Level Domain</b></a> <span style="color:var(--faint);">&mdash; Windows/macOS network only</span></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22GenAI%20Process%20Performing%20Encoding%2FChunking%20Prior%20to%20Network%20Activity%22&type=code"><b>GenAI Process Performing Encoding/Chunking Prior to Network Activity</b></a> <span style="color:var(--faint);">&mdash; process&rarr;network sequence</span></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Connection%20to%20Common%20Large%20Language%20Model%20Endpoints%22&type=code"><b>Connection to Common Large Language Model Endpoints</b></a> <span style="color:var(--faint);">&mdash; Windows/macOS DNS only</span></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Unusual%20Process%20Modifying%20GenAI%20Configuration%20File%22&type=code"><b>Unusual Process Modifying GenAI Configuration File</b></a> <span style="color:var(--faint);">&mdash; new_terms, endpoint file events</span></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22Elastic%20Defend%20Alert%20from%20GenAI%20Utility%20or%20Descendant%22&type=code"><b>Elastic Defend Alert from GenAI Utility or Descendant</b></a> <span style="color:var(--faint);">&mdash; ES|QL, needs Elastic Defend endpoint alerts</span></li>
+                <li><a href="https://github.com/search?q=repo%3Aelastic%2Fdetection-rules+%22LLM-Based%20Attack%20Chain%20Triage%20by%20Host%22&type=code"><b>LLM-Based Attack Chain Triage by Host</b></a> <span style="color:var(--faint);">&mdash; ES|QL, needs an LLM inference connector</span></li>
               </ul>
             </div>
           </div>
